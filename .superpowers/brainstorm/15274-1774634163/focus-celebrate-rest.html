@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus → Celebrate → Rest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0e0e14;
+      color: #EDEDEF;
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      padding: 32px 16px;
+      min-height: 100vh;
+    }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .page-sub {
+      text-align: center;
+      color: #8A8F98;
+      font-size: 14px;
+      margin-bottom: 40px;
+    }
+
+    /* LAYOUT */
+    .screens-row {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .screen-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .screen-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #8B5CF6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .screen-label .num {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      background: rgba(139,92,246,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .arrow {
+      color: #334155;
+      font-size: 28px;
+      align-self: center;
+      margin-top: 40px;
+    }
+
+    /* PHONE */
+    .phone {
+      width: 320px;
+      min-height: 620px;
+      background: #050506;
+      border-radius: 36px;
+      border: 2px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .phone .status {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 24px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      position: relative;
+      z-index: 1;
+    }
+    .phone .content {
+      position: relative;
+      z-index: 1;
+      padding: 0 20px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 560px;
+    }
+    .phone .ambient {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .home-ind {
+      width: 120px;
+      height: 4px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 3px;
+      margin: auto auto 6px;
+    }
+
+    /* ============ FOCUS SCREEN ============ */
+    .focus-ambient {
+      width: 250px; height: 250px;
+      background: #8B5CF6;
+      top: 30%; left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.05;
+      animation: focus-pulse 4s ease-in-out infinite;
+    }
+    @keyframes focus-pulse {
+      0%, 100% { opacity: 0.04; transform: translateX(-50%) scale(1); }
+      50% { opacity: 0.08; transform: translateX(-50%) scale(1.1); }
+    }
+
+    .focus-task {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #8A8F98;
+      width: 100%;
+      text-align: center;
+      margin-top: 8px;
+      margin-bottom: 20px;
+    }
+    .focus-task strong { color: #C4B5FD; font-weight: 600; }
+
+    .focus-ring-wrap {
+      width: 200px;
+      height: 200px;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .focus-ring-wrap svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .focus-track { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 4; }
+    .focus-progress {
+      fill: none;
+      stroke: url(#focusGrad);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 565.49;
+      stroke-dashoffset: 170;
+      filter: drop-shadow(0 0 8px rgba(139,92,246,0.3));
+      transition: stroke-dashoffset 1s ease;
+    }
+    .focus-time-display {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .focus-digits {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .focus-digits .c { opacity: 0.3; animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity: 1; } }
+    .focus-pct {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .focus-msg {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 24px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .focus-controls {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+    .focus-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .focus-btn.pause {
+      background: rgba(139,92,246,0.12);
+      color: #C4B5FD;
+      border: 1px solid rgba(139,92,246,0.2);
+    }
+    .focus-btn.end {
+      background: rgba(255,255,255,0.04);
+      color: #64748b;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ============ CELEBRATE SCREEN ============ */
+    .celebrate-ambient {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, #F59E0B, #8B5CF6);
+      top: 20%; left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.08;
+      animation: celebrate-glow 2s ease-in-out infinite;
+    }
+    @keyframes celebrate-glow {
+      0%, 100% { opacity: 0.06; transform: translateX(-50%) scale(1); }
+      50% { opacity: 0.12; transform: translateX(-50%) scale(1.2); }
+    }
+
+    .confetti-area {
+      width: 100%;
+      height: 120px;
+      position: relative;
+      margin-top: 20px;
+    }
+    .confetti {
+      position: absolute;
+      width: 6px;
+      border-radius: 2px;
+      animation: confetti-fall 1.5s ease-out forwards;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100px) rotate(720deg); opacity: 0; }
+    }
+
+    .celebrate-check {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #059669, #34d399);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      box-shadow: 0 0 30px rgba(5,150,105,0.3);
+      animation: check-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes check-pop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+    .celebrate-check svg { width: 28px; height: 28px; }
+
+    .celebrate-msg {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #EDEDEF, #C4B5FD);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .celebrate-sub {
+      font-size: 13px;
+      color: #8A8F98;
+      margin-bottom: 28px;
+    }
+
+    .session-badge {
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 12px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .session-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #8B5CF6;
+    }
+    .session-label-text {
+      font-size: 12px;
+      color: #8A8F98;
+      line-height: 1.4;
+    }
+
+    .mood-section {
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    .mood-title {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .mood-options {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    .mood-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      gap: 2px;
+    }
+    .mood-btn:hover {
+      border-color: rgba(139,92,246,0.3);
+      background: rgba(139,92,246,0.08);
+    }
+    .mood-btn .mood-icon { font-size: 20px; }
+    .mood-btn .mood-label { font-size: 8px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .continue-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #059669, #34d399);
+      color: #fff;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(5,150,105,0.25);
+    }
+
+    /* ============ REST SCREEN ============ */
+    .rest-ambient {
+      width: 250px; height: 250px;
+      background: #059669;
+      top: 30%; left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.05;
+      animation: rest-float 6s ease-in-out infinite;
+    }
+    @keyframes rest-float {
+      0%, 100% { opacity: 0.04; transform: translateX(-50%) scale(1); }
+      50% { opacity: 0.07; transform: translateX(-50%) scale(1.1); }
+    }
+
+    .rest-header {
+      margin-top: 16px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .rest-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(5,150,105,0.1);
+      border: 1px solid rgba(5,150,105,0.2);
+      font-size: 12px;
+      font-weight: 600;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .rest-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: rest-dot-pulse 2s ease-in-out infinite;
+    }
+    @keyframes rest-dot-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .rest-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    .rest-sub {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .rest-ring-wrap {
+      width: 180px;
+      height: 180px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .rest-ring-wrap svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .rest-track { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 4; }
+    .rest-progress {
+      fill: none;
+      stroke: url(#restGrad);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 502.65;
+      stroke-dashoffset: 100;
+      filter: drop-shadow(0 0 6px rgba(5,150,105,0.3));
+    }
+    .rest-time {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .rest-digits {
+      font-size: 38px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .rest-digits .c { opacity: 0.3; }
+    .rest-mode {
+      font-size: 11px;
+      color: #059669;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+
+    .rest-suggestions {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .rest-sug-title {
+      font-size: 11px;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .rest-sug-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rest-sug-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      font-size: 13px;
+      color: #8A8F98;
+    }
+    .rest-sug-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(5,150,105,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rest-sug-icon svg { width: 14px; height: 14px; }
+
+    .skip-rest-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      color: #64748b;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* NOTES SECTION */
+    .notes-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .note-col h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: #EDEDEF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .note-col h3 .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .note-block-sm {
+      margin-bottom: 14px;
+      padding-left: 14px;
+      border-left: 2px solid rgba(139,92,246,0.2);
+    }
+    .note-block-sm .nt {
+      font-size: 11px;
+      font-weight: 700;
+      color: #C4B5FD;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 2px;
+    }
+    .note-block-sm .nb {
+      font-size: 12px;
+      color: #8A8F98;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1200px) {
+      .screens-row { gap: 16px; }
+      .phone { width: 280px; min-height: 560px; border-radius: 30px; }
+      .phone .content { padding: 0 16px 20px; }
+      .focus-digits { font-size: 36px; }
+      .celebrate-msg { font-size: 18px; }
+      .rest-digits { font-size: 32px; }
+      .notes-section { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<h2>Focus → Celebrate → Rest</h2>
+<p class="page-sub">The core session cycle · Three connected screens</p>
+
+<div class="screens-row">
+
+  <!-- ======= FOCUS ======= -->
+  <div class="screen-col">
+    <div class="screen-label"><div class="num">1</div> Focus Mode</div>
+    <div class="phone">
+      <div class="ambient focus-ambient"></div>
+      <div class="status"><span>9:45</span><span style="color:#8B5CF6;font-size:10px;">FOCUSING</span></div>
+      <div class="content">
+        <div class="focus-task">Working on: <strong>Write essay intro</strong></div>
+
+        <div class="focus-ring-wrap">
+          <svg viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="focusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8B5CF6"/>
+                <stop offset="100%" stop-color="#C4B5FD"/>
+              </linearGradient>
+            </defs>
+            <circle class="focus-track" cx="100" cy="100" r="90"/>
+            <circle class="focus-progress" cx="100" cy="100" r="90"/>
+          </svg>
+          <div class="focus-time-display">
+            <div class="focus-digits">18<span class="c">:</span>42</div>
+            <div class="focus-pct">70% complete</div>
+          </div>
+        </div>
+
+        <div class="focus-msg">"You're doing great. Stay with it."</div>
+
+        <div class="focus-controls">
+          <button class="focus-btn pause">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 6px;"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+            Pause
+          </button>
+          <button class="focus-btn end">End Early</button>
+        </div>
+
+        <div class="home-ind" style="margin-top:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- ======= CELEBRATE ======= -->
+  <div class="screen-col">
+    <div class="screen-label"><div class="num">2</div> Celebration</div>
+    <div class="phone">
+      <div class="ambient celebrate-ambient"></div>
+      <div class="status"><span>10:10</span><span></span></div>
+      <div class="content">
+        <div class="confetti-area">
+          <div class="confetti" style="left:15%; height:18px; background:#8B5CF6; animation-delay:0s;"></div>
+          <div class="confetti" style="left:30%; height:14px; background:#F59E0B; animation-delay:0.1s;"></div>
+          <div class="confetti" style="left:45%; height:20px; background:#C4B5FD; animation-delay:0.2s;"></div>
+          <div class="confetti" style="left:60%; height:12px; background:#34d399; animation-delay:0.15s;"></div>
+          <div class="confetti" style="left:75%; height:16px; background:#8B5CF6; animation-delay:0.25s;"></div>
+          <div class="confetti" style="left:85%; height:14px; background:#F59E0B; animation-delay:0.05s;"></div>
+          <div class="confetti" style="left:20%; height:10px; background:#34d399; animation-delay:0.3s;"></div>
+          <div class="confetti" style="left:50%; height:16px; background:#C4B5FD; animation-delay:0.18s;"></div>
+        </div>
+
+        <div class="celebrate-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+
+        <div class="celebrate-msg">You just did something hard. That matters.</div>
+        <div class="celebrate-sub">25 minutes of focus — completed</div>
+
+        <div class="session-badge">
+          <div class="session-num">4</div>
+          <div class="session-label-text">sessions today<br><span style="color:#F59E0B;">5-day streak</span></div>
+        </div>
+
+        <div class="mood-section">
+          <div class="mood-title">How do you feel?</div>
+          <div class="mood-options">
+            <div class="mood-btn">
+              <svg class="mood-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              <span class="mood-label">Hard</span>
+            </div>
+            <div class="mood-btn">
+              <svg class="mood-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              <span class="mood-label">Okay</span>
+            </div>
+            <div class="mood-btn" style="border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.08);">
+              <svg class="mood-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              <span class="mood-label">Good</span>
+            </div>
+            <div class="mood-btn">
+              <svg class="mood-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              <span class="mood-label">Great</span>
+            </div>
+            <div class="mood-btn">
+              <svg class="mood-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 3 4 3 4-3 4-3"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              <span class="mood-label">Flow</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="continue-btn">Take a Break</button>
+        <div class="home-ind" style="margin-top:16px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- ======= REST ======= -->
+  <div class="screen-col">
+    <div class="screen-label"><div class="num">3</div> Rest Mode</div>
+    <div class="phone">
+      <div class="ambient rest-ambient"></div>
+      <div class="status"><span>10:11</span><span style="color:#059669;font-size:10px;">RESTING</span></div>
+      <div class="content">
+        <div class="rest-header">
+          <div class="rest-badge">
+            <div class="rest-badge-dot"></div>
+            Rest
+          </div>
+          <div class="rest-title">You've earned this</div>
+          <div class="rest-sub">Step away from the screen</div>
+        </div>
+
+        <div class="rest-ring-wrap">
+          <svg viewBox="0 0 180 180">
+            <defs>
+              <linearGradient id="restGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#059669"/>
+                <stop offset="100%" stop-color="#34d399"/>
+              </linearGradient>
+            </defs>
+            <circle class="rest-track" cx="90" cy="90" r="80"/>
+            <circle class="rest-progress" cx="90" cy="90" r="80"/>
+          </svg>
+          <div class="rest-time">
+            <div class="rest-digits">08<span class="c">:</span>15</div>
+            <div class="rest-mode">Break</div>
+          </div>
+        </div>
+
+        <div class="rest-suggestions">
+          <div class="rest-sug-title">Break ideas</div>
+          <div class="rest-sug-items">
+            <div class="rest-sug-item">
+              <div class="rest-sug-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+              Stretch to your favorite song
+            </div>
+            <div class="rest-sug-item">
+              <div class="rest-sug-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+              Get up and look out the window
+            </div>
+            <div class="rest-sug-item">
+              <div class="rest-sug-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+              Grab a glass of water
+            </div>
+          </div>
+        </div>
+
+        <button class="skip-rest-btn">Skip Break</button>
+        <div class="home-ind" style="margin-top:auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DESIGN NOTES -->
+<div class="notes-section">
+  <div class="note-col">
+    <h3><div class="dot" style="background:#8B5CF6;"></div> Focus Mode</h3>
+    <div class="note-block-sm">
+      <div class="nt">Task Anchoring</div>
+      <div class="nb">Your intention from the home screen stays visible at top. When your ADHD brain asks "wait, what was I doing?" — the answer is right there.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">Ambient Encouragement</div>
+      <div class="nb">Subtle rotating messages appear: "You're doing great," "Almost halfway," "Stay with it." Never intrusive — just a gentle anchor. Toggleable in settings.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">End Early ≠ Failure</div>
+      <div class="nb">"End Early" button is there without judgment. If you focused for 8 of 25 minutes, that still counts as a session. The celebration screen still fires.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">Wake Lock API</div>
+      <div class="nb">Screen stays on during focus. No accidental lock. The timer is always visible without touching the phone.</div>
+    </div>
+  </div>
+
+  <div class="note-col">
+    <h3><div class="dot" style="background:#F59E0B;"></div> Celebration</h3>
+    <div class="note-block-sm">
+      <div class="nt">Confetti + Sound</div>
+      <div class="nb">Particle burst (canvas-based, performant) + a warm chime. The celebration is 3-4 seconds — long enough to feel rewarding, short enough not to annoy.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">Rotating Messages</div>
+      <div class="nb">Pool of 30+ messages: "You showed up. That's everything." / "Your brain needed that. Well done." / "Small wins build big things." Never repeats within a day.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">Mood Check-In: SVG Faces</div>
+      <div class="nb">5 options with SVG face icons (Hard / Okay / Good / Great / Flow). One tap, no friction. Mood data feeds the Insights dashboard. The "Flow" option captures those rare magical sessions.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">Partial Sessions Count</div>
+      <div class="nb">Even if you ended early, you get the celebration. A 5-minute session after 3 days of nothing deserves confetti.</div>
+    </div>
+  </div>
+
+  <div class="note-col">
+    <h3><div class="dot" style="background:#059669;"></div> Rest Mode</h3>
+    <div class="note-block-sm">
+      <div class="nt">Color Shift</div>
+      <div class="nb">Entire palette shifts from violet to emerald green. Subconscious signal: different mode, different energy. The transition is a 700ms crossfade.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">"You've earned this"</div>
+      <div class="nb">Framing rest as an achievement, not laziness. ADHD users often feel guilty about breaks. This language reframes rest as part of the process.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">Break Suggestions</div>
+      <div class="nb">Physical micro-activities: stretch, look out window, get water. Encourages actually leaving the desk — ADHD rest ≠ scrolling phone. Suggestions rotate each session.</div>
+    </div>
+    <div class="note-block-sm">
+      <div class="nt">Break Duration</div>
+      <div class="nb">Auto-calculated: 5 min break after 5/15-min sessions, 10 min after 25-min, 15 min after every 4th session (long break). Skippable.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

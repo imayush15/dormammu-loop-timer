@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pre-Session Ritual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0e0e14;
+      color: #EDEDEF;
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 24px;
+      flex-wrap: wrap;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: #EDEDEF;
+      width: 100%;
+      text-align: center;
+      margin-bottom: -20px;
+    }
+    .subtitle {
+      text-align: center;
+      width: 100%;
+      color: #8A8F98;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* PHONE FRAME */
+    .phone-frame {
+      width: 375px;
+      min-height: 740px;
+      background: #050506;
+      border-radius: 40px;
+      border: 2px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 100px rgba(139,92,246,0.06);
+    }
+
+    .ambient {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-1 {
+      width: 300px; height: 300px;
+      background: #8B5CF6;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.06;
+      animation: breathe-blob 8s ease-in-out infinite;
+    }
+    @keyframes breathe-blob {
+      0%, 100% { opacity: 0.06; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.12; transform: translate(-50%, -50%) scale(1.3); }
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 28px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #8A8F98;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 660px;
+    }
+
+    /* SKIP BUTTON */
+    .skip-btn {
+      align-self: flex-end;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      padding: 8px 0;
+      margin-bottom: 40px;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      font-family: inherit;
+    }
+    .skip-btn:hover { color: #8A8F98; }
+
+    /* BREATHING CIRCLE */
+    .breath-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 48px;
+      flex: 1;
+      justify-content: center;
+    }
+    .breath-circle-outer {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .breath-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid rgba(139, 92, 246, 0.15);
+      animation: breathe-ring 8s ease-in-out infinite;
+    }
+    .breath-ring-2 {
+      position: absolute;
+      inset: -16px;
+      border-radius: 50%;
+      border: 1px solid rgba(139, 92, 246, 0.08);
+      animation: breathe-ring 8s ease-in-out infinite 0.3s;
+    }
+    .breath-ring-3 {
+      position: absolute;
+      inset: -32px;
+      border-radius: 50%;
+      border: 1px solid rgba(139, 92, 246, 0.04);
+      animation: breathe-ring 8s ease-in-out infinite 0.6s;
+    }
+    @keyframes breathe-ring {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.6; }
+    }
+
+    .breath-circle-inner {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: breathe-circle 8s ease-in-out infinite;
+      box-shadow: 0 0 60px rgba(139, 92, 246, 0.15);
+    }
+    @keyframes breathe-circle {
+      0%, 100% { transform: scale(0.85); box-shadow: 0 0 30px rgba(139,92,246,0.1); }
+      35% { transform: scale(1.1); box-shadow: 0 0 60px rgba(139,92,246,0.2); }
+      50% { transform: scale(1.1); box-shadow: 0 0 60px rgba(139,92,246,0.2); }
+      85% { transform: scale(0.85); box-shadow: 0 0 30px rgba(139,92,246,0.1); }
+    }
+
+    .breath-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: #C4B5FD;
+      text-align: center;
+      animation: breathe-text 8s ease-in-out infinite;
+    }
+    @keyframes breathe-text {
+      0%, 15% { opacity: 1; }
+      20% { opacity: 0; }
+      35%, 50% { opacity: 1; }
+      55% { opacity: 0; }
+      70%, 85% { opacity: 1; }
+      90% { opacity: 0; }
+      95%, 100% { opacity: 1; }
+    }
+
+    /* PHASE INDICATOR */
+    .phase-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: #EDEDEF;
+      margin-top: 32px;
+      margin-bottom: 8px;
+      animation: breathe-phase 8s ease-in-out infinite;
+    }
+    @keyframes breathe-phase {
+      0%, 10% { opacity: 1; }
+      15% { opacity: 0; }
+      20%, 45% { opacity: 1; }
+      50% { opacity: 0; }
+      55%, 80% { opacity: 1; }
+      85% { opacity: 0; }
+      90%, 100% { opacity: 1; }
+    }
+    .phase-sub {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* DOTS */
+    .breath-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 32px;
+    }
+    .breath-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(139, 92, 246, 0.2);
+      transition: all 0.4s ease;
+    }
+    .breath-dot.active {
+      background: #8B5CF6;
+      box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+    }
+    .breath-dot.done {
+      background: rgba(139, 92, 246, 0.5);
+    }
+
+    /* TAPPING TEXT */
+    .tap-hint {
+      position: absolute;
+      bottom: 64px;
+      font-size: 12px;
+      color: #475569;
+      text-align: center;
+    }
+
+    .home-indicator {
+      width: 134px;
+      height: 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      margin: auto auto 8px;
+    }
+
+    /* DESIGN NOTES */
+    .design-notes {
+      max-width: 420px;
+      flex-shrink: 0;
+    }
+    .design-notes h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #EDEDEF;
+    }
+    .note-block {
+      margin-bottom: 20px;
+      padding-left: 16px;
+      border-left: 2px solid rgba(139,92,246,0.3);
+    }
+    .note-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #C4B5FD;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .note-body {
+      font-size: 13px;
+      color: #8A8F98;
+      line-height: 1.6;
+    }
+    .principle-box {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+    .principle-box .note-title {
+      color: #8B5CF6;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #8A8F98;
+    }
+    .flow-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: rgba(139,92,246,0.12);
+      color: #8B5CF6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Pre-Session Ritual Screen</h2>
+<p class="subtitle">The 12-second breathing transition · Always skippable · Creates mental separation</p>
+
+<!-- PHONE -->
+<div class="phone-frame">
+  <div class="ambient ambient-1"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>Focus Companion</span>
+  </div>
+
+  <div class="screen-content">
+    <button class="skip-btn">Skip →</button>
+
+    <div class="breath-wrapper">
+      <div class="breath-circle-outer">
+        <div class="breath-ring"></div>
+        <div class="breath-ring-2"></div>
+        <div class="breath-ring-3"></div>
+        <div class="breath-circle-inner">
+          <div class="breath-text">Breathe in</div>
+        </div>
+      </div>
+
+      <div class="phase-label">Breathe in</div>
+      <div class="phase-sub">Let your shoulders drop</div>
+
+      <div class="breath-dots">
+        <div class="breath-dot done"></div>
+        <div class="breath-dot active"></div>
+        <div class="breath-dot"></div>
+      </div>
+    </div>
+
+    <div class="tap-hint">Tap anywhere to skip</div>
+    <div class="home-indicator"></div>
+  </div>
+</div>
+
+<!-- NOTES -->
+<div class="design-notes">
+  <h3>Ritual Design</h3>
+
+  <div class="note-block">
+    <div class="note-title">Purpose: Mental Gear Shift</div>
+    <div class="note-body">ADHD brains struggle with task-switching. A 12-second breathing pause creates a physical boundary between "scrolling mode" and "focus mode." It's not meditation — it's a gear shift.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">Always Skippable</div>
+    <div class="note-body">Skip button top-right. "Tap anywhere to skip" at bottom. Two escape routes. ADHD users viscerally hate forced waits — a mandatory ritual would get the app uninstalled. Making it optional makes it feel like a gift, not a gate.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">The Breathing Pattern: 4-4-4</div>
+    <div class="note-body">4 seconds in → 4 seconds hold → 4 seconds out. Three cycles = 36 seconds max. But users can skip after the first cycle (12s). The dots show progress through cycles.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">Visual Language</div>
+    <div class="note-body">Expanding/contracting circle with concentric ripple rings. Ambient blob intensifies during inhale, fades during exhale. The entire screen breathes with you. No numbers, no countdown — pure visual rhythm.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">Micro-copy: Body Cues</div>
+    <div class="note-body">Below the breathing phase, a body-awareness prompt rotates: "Let your shoulders drop," "Unclench your jaw," "Feet flat on the floor." Grounds the user in their body — a technique from ADHD therapy.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">Transition Out</div>
+    <div class="note-body">After the last exhale (or skip), the breathing circle morphs into the timer ring via a shared-element transition. The violet glow carries forward. Spatial continuity — per UI/UX Pro animation guidelines.</div>
+  </div>
+
+  <div class="principle-box">
+    <div class="note-title">Breathing Cycle Flow</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <span>Circle expands — "Breathe in" (4s)</span>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <span>Circle holds — "Hold" (4s)</span>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <span>Circle contracts — "Breathe out" (4s)</span>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">•</div>
+        <span>Dot fills → repeat or auto-advance</span>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">→</div>
+        <span>Circle morphs into timer ring → Focus begins</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

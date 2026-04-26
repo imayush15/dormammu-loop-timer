@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Screen Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0e0e14;
+      color: #EDEDEF;
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 24px;
+      flex-wrap: wrap;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: #EDEDEF;
+      width: 100%;
+      text-align: center;
+      margin-bottom: -20px;
+    }
+
+    .subtitle {
+      text-align: center;
+      width: 100%;
+      color: #8A8F98;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== PHONE MOCKUP ===== */
+    .phone-frame {
+      width: 375px;
+      min-height: 740px;
+      background: #050506;
+      border-radius: 40px;
+      border: 2px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 25px 60px rgba(0,0,0,0.6),
+        0 0 100px rgba(139, 92, 246, 0.06);
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #8A8F98;
+    }
+
+    /* Ambient blobs */
+    .ambient {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-1 {
+      width: 200px; height: 200px;
+      background: #8B5CF6;
+      top: -40px; right: -40px;
+      animation: float1 8s ease-in-out infinite;
+    }
+    .ambient-2 {
+      width: 160px; height: 160px;
+      background: #C4B5FD;
+      bottom: 120px; left: -30px;
+      animation: float2 10s ease-in-out infinite;
+    }
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-20px, 20px); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(15px, -15px); }
+    }
+
+    .screen-content {
+      position: relative;
+      z-index: 1;
+      padding: 8px 24px 32px;
+    }
+
+    /* ===== GREETING ===== */
+    .greeting {
+      margin-bottom: 32px;
+    }
+    .greeting-time {
+      font-size: 12px;
+      color: #64748b;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .greeting-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #EDEDEF 30%, #C4B5FD);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .greeting-sub {
+      font-size: 14px;
+      color: #8A8F98;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* ===== STATS ROW ===== */
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .stat-pill {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #EDEDEF;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-value.streak { color: #F59E0B; }
+    .stat-value.sessions { color: #8B5CF6; }
+    .stat-value.minutes { color: #059669; }
+    .stat-label {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 500;
+    }
+
+    /* ===== INTENTION FIELD ===== */
+    .intention-field {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: border-color 0.3s ease;
+    }
+    .intention-field:hover {
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+    .intention-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(139, 92, 246, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .intention-icon svg { width: 16px; height: 16px; }
+    .intention-text {
+      font-size: 14px;
+      color: #64748b;
+    }
+    .intention-text span {
+      display: block;
+      font-size: 11px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    /* ===== DURATION SELECTOR ===== */
+    .duration-section {
+      margin-bottom: 28px;
+    }
+    .duration-label {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .duration-pills {
+      display: flex;
+      gap: 8px;
+    }
+    .dur-pill {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #8A8F98;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .dur-pill span {
+      display: block;
+      font-size: 10px;
+      color: #475569;
+      margin-top: 2px;
+    }
+    .dur-pill.active {
+      background: rgba(139, 92, 246, 0.12);
+      border-color: rgba(139, 92, 246, 0.4);
+      color: #C4B5FD;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    }
+    .dur-pill.recommended::after {
+      content: 'try this';
+      position: absolute;
+      top: -8px;
+      right: -4px;
+      font-size: 8px;
+      background: rgba(245, 158, 11, 0.2);
+      color: #F59E0B;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ===== TIMER PREVIEW ===== */
+    .timer-preview {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .timer-circle {
+      width: 180px;
+      height: 180px;
+      position: relative;
+    }
+    .timer-circle svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .timer-circle .track {
+      fill: none;
+      stroke: rgba(255,255,255,0.04);
+      stroke-width: 4;
+    }
+    .timer-circle .progress {
+      fill: none;
+      stroke: url(#timerGrad);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 502.65;
+      stroke-dashoffset: 0;
+      filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.3));
+    }
+    .timer-time {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .timer-digits {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-digits .colon {
+      opacity: 0.3;
+      margin: 0 1px;
+    }
+    .timer-mode-label {
+      font-size: 11px;
+      color: #8B5CF6;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-top: 4px;
+    }
+
+    /* ===== START BUTTON ===== */
+    .start-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+      color: #fff;
+      box-shadow:
+        0 4px 24px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .start-btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 8px 32px rgba(139, 92, 246, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .start-shortcut {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .start-shortcut kbd {
+      background: rgba(255,255,255,0.06);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ===== BOTTOM NAV ===== */
+    .bottom-nav {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      padding: 16px 0 8px;
+      margin-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #475569;
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .nav-item.active { color: #8B5CF6; }
+    .nav-item svg { width: 20px; height: 20px; }
+
+    /* HOME INDICATOR */
+    .home-indicator {
+      width: 134px;
+      height: 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      margin: 12px auto 8px;
+    }
+
+    /* ===== DESIGN NOTES ===== */
+    .design-notes {
+      max-width: 420px;
+      flex-shrink: 0;
+    }
+    .design-notes h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #EDEDEF;
+    }
+    .note-block {
+      margin-bottom: 20px;
+      padding-left: 16px;
+      border-left: 2px solid rgba(139, 92, 246, 0.3);
+    }
+    .note-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #C4B5FD;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .note-body {
+      font-size: 13px;
+      color: #8A8F98;
+      line-height: 1.6;
+    }
+    .principle-box {
+      background: rgba(139, 92, 246, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+    .principle-box .note-title {
+      color: #8B5CF6;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .vs-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .vs-card {
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .vs-card.bad {
+      background: rgba(220, 38, 38, 0.06);
+      border: 1px solid rgba(220, 38, 38, 0.15);
+      color: #f87171;
+    }
+    .vs-card.good {
+      background: rgba(5, 150, 105, 0.06);
+      border: 1px solid rgba(5, 150, 105, 0.15);
+      color: #34d399;
+    }
+    .vs-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Home Screen — Redesigned</h2>
+<p class="subtitle">Modern Dark Cinema style · Mental Health palette · Premium Sans typography</p>
+
+<!-- PHONE MOCKUP -->
+<div class="phone-frame">
+  <div class="ambient ambient-1"></div>
+  <div class="ambient ambient-2"></div>
+
+  <div class="status-bar">
+    <span>9:41</span>
+    <span style="display:flex;gap:4px;align-items:center;">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#8A8F98" stroke-width="2"><path d="M1 1l4 4m0-4l-4 4M8.11 16.11A6.98 6.98 0 0112 15c1.45 0 2.79.44 3.89 1.11M1.39 8.61A16.91 16.91 0 0112 5c3.94 0 7.56 1.34 10.61 3.61M4.93 12.07A10.94 10.94 0 0112 10c2.76 0 5.3.96 7.07 2.07"/></svg>
+      <svg width="14" height="14" fill="#8A8F98" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><rect x="19" y="9" width="4" height="6" rx="1"/><rect x="3" y="8" width="8" height="8" rx="1" fill="#34d399"/></svg>
+    </span>
+  </div>
+
+  <div class="screen-content">
+    <!-- Greeting -->
+    <div class="greeting">
+      <div class="greeting-time">Thursday evening</div>
+      <div class="greeting-text">Ready when you are</div>
+      <div class="greeting-sub">You've focused for <strong style="color: #8B5CF6;">47 min</strong> today</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-pill">
+        <div class="stat-value streak">5</div>
+        <div class="stat-label">Day streak</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-value sessions">3</div>
+        <div class="stat-label">Sessions</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-value minutes">47</div>
+        <div class="stat-label">Minutes</div>
+      </div>
+    </div>
+
+    <!-- Intention -->
+    <div class="intention-field">
+      <div class="intention-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <div class="intention-text">
+        Set an intention
+        <span>What will you focus on?</span>
+      </div>
+    </div>
+
+    <!-- Duration -->
+    <div class="duration-section">
+      <div class="duration-label">Session length</div>
+      <div class="duration-pills">
+        <div class="dur-pill recommended">5<span>min</span></div>
+        <div class="dur-pill">15<span>min</span></div>
+        <div class="dur-pill active">25<span>min</span></div>
+        <div class="dur-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-preview">
+      <div class="timer-circle">
+        <svg viewBox="0 0 180 180">
+          <defs>
+            <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8B5CF6"/>
+              <stop offset="100%" stop-color="#C4B5FD"/>
+            </linearGradient>
+          </defs>
+          <circle class="track" cx="90" cy="90" r="80"/>
+          <circle class="progress" cx="90" cy="90" r="80"/>
+        </svg>
+        <div class="timer-time">
+          <div class="timer-digits">25<span class="colon">:</span>00</div>
+          <div class="timer-mode-label">Focus</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start -->
+    <button class="start-btn">Begin Focus Session</button>
+    <div class="start-shortcut">Press <kbd>Space</kbd> to start</div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Timer
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        Insights
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </div>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+</div>
+
+<!-- DESIGN NOTES -->
+<div class="design-notes">
+  <h3>What Changed & Why</h3>
+
+  <div class="note-block">
+    <div class="note-title">Style: Modern Dark Cinema</div>
+    <div class="note-body">Deep black base (#050506), animated ambient light blobs, no pure #000 (prevents OLED smear). Subtle glassmorphism on cards. The background feels alive — not static.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">Palette: Mental Health Lavender</div>
+    <div class="note-body">Primary #8B5CF6 (calming violet), secondary #C4B5FD (soft lavender), accent #059669 (wellness green), warm amber #F59E0B for streaks. Clinically calming — violet reduces anxiety in color psychology studies.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">Typography: DM Sans + Playfair Display</div>
+    <div class="note-body">Playfair for the greeting (warmth, personality, not robotic). DM Sans for everything else (clean, readable, premium). The serif heading makes this feel like a journal, not an app.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">"Ready when you are"</div>
+    <div class="note-body">Not "Good evening" — that's what every app says. This is a companion. It's patient. It doesn't judge when you opened it. It's just... ready.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">"Try this" on 5-min pill</div>
+    <div class="note-body">Adaptive nudge. If the user hasn't started in 3+ days, the app suggests 5 min to lower the barrier. After consistent use, this label disappears. The app learns.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">Stats as ambient context</div>
+    <div class="note-body">Three pills (streak, sessions, minutes) give a sense of progress without demanding attention. No graphs. No dashboards. Just three gentle numbers.</div>
+  </div>
+
+  <div class="note-block">
+    <div class="note-title">SVG icons, not emoji</div>
+    <div class="note-body">Per UI/UX Pro guidelines: emoji renders inconsistently across platforms and looks unprofessional. Lucide-style SVG icons throughout.</div>
+  </div>
+
+  <div class="principle-box">
+    <div class="note-title">Design Philosophy: Companion, Not Tool</div>
+    <div class="note-body">This screen doesn't look like a Pomodoro timer. It looks like something that knows you. The serif heading, the patient language, the living background — it feels like opening a journal, not launching a utility.</div>
+    <div class="vs-block">
+      <div class="vs-card bad">
+        <div class="vs-label">Generic AI Timer</div>
+        "Good evening ✨"<br>
+        Big countdown centered<br>
+        Start / Pause / Reset buttons<br>
+        Session counter
+      </div>
+      <div class="vs-card good">
+        <div class="vs-label">Focus Companion</div>
+        "Ready when you are"<br>
+        Ambient stats + intention<br>
+        Adaptive duration nudges<br>
+        Living, breathing background
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

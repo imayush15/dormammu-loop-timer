@@ -1,0 +1,108 @@
+<h2>Home Screen Design</h2>
+<p class="subtitle">The first thing users see. This must reduce activation energy to zero.</p>
+
+<div class="split" style="gap: 32px; align-items: start;">
+
+  <!-- MOCKUP -->
+  <div class="mockup" style="flex: 1; max-width: 380px;">
+    <div class="mockup-header">Home — Ready State</div>
+    <div class="mockup-body" style="background: #0a0a0f; color: #f0f0f5; padding: 32px 24px; font-family: 'Inter', system-ui, sans-serif; min-height: 520px; display: flex; flex-direction: column; position: relative;">
+
+      <!-- Top bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+        <div style="font-size: 13px; color: #64748b;">
+          🔥 <span style="color: #ff9a44; font-weight: 700;">5</span> day streak
+        </div>
+        <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer;">
+          📊
+        </div>
+      </div>
+
+      <!-- Greeting -->
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 22px; font-weight: 700; margin-bottom: 4px;">Good evening ✨</div>
+        <div style="font-size: 14px; color: #64748b;">You've completed <span style="color: #ff6b4a; font-weight: 600;">3 sessions</span> today</div>
+      </div>
+
+      <!-- Task input -->
+      <div style="margin-bottom: 24px;">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; margin-bottom: 8px; font-weight: 600;">What are you working on?</div>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; color: #94a3b8; font-size: 14px;">
+          e.g. "Write essay intro" <span style="float: right; font-size: 11px; color: #334155;">optional</span>
+        </div>
+      </div>
+
+      <!-- Duration picker -->
+      <div style="margin-bottom: 28px;">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; margin-bottom: 10px; font-weight: 600;">Session length</div>
+        <div style="display: flex; gap: 8px;">
+          <div style="flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; font-size: 14px; font-weight: 500;">5m</div>
+          <div style="flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; font-size: 14px; font-weight: 500;">15m</div>
+          <div style="flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: rgba(255,107,74,0.15); border: 1px solid rgba(255,107,74,0.4); color: #ff6b4a; font-size: 14px; font-weight: 700;">25m</div>
+          <div style="flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; font-size: 14px; font-weight: 500;">⚙️</div>
+        </div>
+      </div>
+
+      <!-- Timer ring preview -->
+      <div style="display: flex; justify-content: center; margin-bottom: 28px;">
+        <div style="width: 160px; height: 160px; border-radius: 50%; border: 3px solid rgba(255,107,74,0.2); display: flex; align-items: center; justify-content: center; position: relative;">
+          <div style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em;">25:00</div>
+        </div>
+      </div>
+
+      <!-- Start button -->
+      <div style="margin-top: auto;">
+        <div style="background: linear-gradient(135deg, #ff6b4a, #ff9a44); color: #0a0a0f; text-align: center; padding: 16px; border-radius: 999px; font-weight: 700; font-size: 16px; letter-spacing: 0.02em; box-shadow: 0 4px 20px rgba(255,107,74,0.35);">
+          Start Focus
+        </div>
+        <div style="text-align: center; margin-top: 12px; font-size: 12px; color: #334155;">
+          or press <span style="background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 11px;">Space</span> to begin
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DETAILS -->
+  <div style="flex: 1; min-width: 280px;">
+    <h3 style="margin-bottom: 16px;">Key Design Decisions</h3>
+
+    <div style="margin-bottom: 20px;">
+      <div class="label">Greeting</div>
+      <p>Time-aware ("Good morning/afternoon/evening") + today's session count. Returning after missed days shows "Welcome back 💛" — never guilt.</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <div class="label">Task Input</div>
+      <p>Optional, never required. Naming your task reduces ADHD paralysis ("What should I work on??" → just type something). Saved in session history.</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <div class="label">Duration Picker</div>
+      <p><strong>5 / 15 / 25 / Custom</strong> — the 5-minute option is crucial for ADHD. "I can do 5 minutes" breaks the starting barrier. Many users discover they keep going past 5. The ⚙️ button opens a custom minutes input.</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <div class="label">Streak Display</div>
+      <p>Visible but not dominant. Top-left, small. Motivating without creating pressure. After a broken streak: "Starting fresh 🌱" not "Streak: 0".</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <div class="label">Dashboard Link</div>
+      <p>📊 icon top-right. Not prominent — this screen is about action, not analysis.</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <div class="label">Keyboard Shortcut</div>
+      <p>Spacebar to start. Zero friction for power users.</p>
+    </div>
+
+    <div style="background: rgba(255, 107, 74, 0.08); border: 1px solid rgba(255, 107, 74, 0.2); border-radius: 12px; padding: 16px; margin-top: 24px;">
+      <div style="font-weight: 700; color: #ff6b4a; margin-bottom: 6px;">🧠 ADHD Design Principle</div>
+      <p style="font-size: 13px; color: #94a3b8; line-height: 1.6;">Everything on this screen exists to answer one question: <em>"Can I just start?"</em> Yes. One tap. No setup required. Task name optional. Duration pre-selected. The breathing ritual is on the NEXT screen, not here. Zero gates between opening the app and beginning.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top: 32px;">Does this home screen design feel right? Reply in the terminal.</p>

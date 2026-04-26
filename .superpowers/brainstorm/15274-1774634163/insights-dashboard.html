@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insights Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0e0e14;
+      color: #EDEDEF;
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 24px;
+      flex-wrap: wrap;
+    }
+    h2 { font-family: 'Playfair Display', serif; font-size: 24px; width: 100%; text-align: center; margin-bottom: -20px; }
+    .page-sub { text-align: center; width: 100%; color: #8A8F98; font-size: 14px; margin-bottom: 16px; }
+
+    /* PHONE */
+    .phone {
+      width: 375px;
+      background: #050506;
+      border-radius: 40px;
+      border: 2px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 100px rgba(139,92,246,0.06);
+    }
+    .phone .ambient {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .amb1 { width: 200px; height: 200px; background: #8B5CF6; top: -40px; right: -60px; opacity: 0.05; }
+    .amb2 { width: 180px; height: 180px; background: #059669; bottom: 100px; left: -50px; opacity: 0.04; }
+
+    .status { display: flex; justify-content: space-between; padding: 14px 28px 8px; font-size: 12px; font-weight: 600; color: #8A8F98; position: relative; z-index: 1; }
+    .scr { position: relative; z-index: 1; padding: 4px 20px 28px; overflow-y: auto; }
+    .home-ind { width: 134px; height: 5px; background: rgba(255,255,255,0.12); border-radius: 3px; margin: 16px auto 8px; }
+
+    /* HEADER */
+    .dash-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .dash-title { font-family: 'Playfair Display', serif; font-size: 24px; }
+    .period-pill {
+      display: flex; gap: 2px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 3px;
+    }
+    .period-opt {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+    }
+    .period-opt.active {
+      background: rgba(139,92,246,0.12);
+      color: #C4B5FD;
+    }
+
+    /* HERO STAT */
+    .hero-stat {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+    }
+    .hero-num {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #8B5CF6, #C4B5FD);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .hero-label { font-size: 13px; color: #8A8F98; }
+    .hero-sub { font-size: 11px; color: #475569; margin-top: 4px; }
+
+    /* STATS ROW */
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .mini-stat {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .mini-val { font-size: 20px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .mini-lbl { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+
+    /* HEATMAP */
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title svg { width: 16px; height: 16px; color: #64748b; }
+
+    .heatmap-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .heatmap-days {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .heatmap-day {
+      font-size: 10px;
+      color: #475569;
+      text-align: center;
+      flex: 1;
+      font-weight: 500;
+    }
+    .heatmap-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .heatmap-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.03);
+    }
+    .heatmap-cell.l1 { background: rgba(139,92,246,0.15); }
+    .heatmap-cell.l2 { background: rgba(139,92,246,0.3); }
+    .heatmap-cell.l3 { background: rgba(139,92,246,0.5); }
+    .heatmap-cell.l4 { background: rgba(139,92,246,0.75); box-shadow: 0 0 6px rgba(139,92,246,0.2); }
+    .heatmap-cell.today { border: 1px solid rgba(139,92,246,0.5); }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .legend-cell {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    /* STREAK MILESTONES */
+    .milestones {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .milestone {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      min-width: 72px;
+    }
+    .milestone.achieved {
+      background: rgba(139,92,246,0.06);
+      border-color: rgba(139,92,246,0.2);
+    }
+    .milestone.achieved .ms-icon { color: #8B5CF6; }
+    .milestone.next {
+      border-style: dashed;
+      border-color: rgba(139,92,246,0.15);
+    }
+    .ms-icon { font-size: 20px; color: #334155; }
+    .ms-days { font-size: 13px; font-weight: 700; color: #EDEDEF; }
+    .ms-label { font-size: 9px; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; }
+    .milestone.achieved .ms-label { color: #8B5CF6; }
+
+    /* MOOD TREND */
+    .mood-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .mood-chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 80px;
+      padding: 8px 0;
+      gap: 2px;
+    }
+    .mood-bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .mood-bar {
+      width: 100%;
+      max-width: 28px;
+      border-radius: 6px 6px 2px 2px;
+      position: relative;
+    }
+    .mood-day-label {
+      font-size: 9px;
+      color: #475569;
+      font-weight: 500;
+    }
+    .mood-avg {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .mood-avg-text { font-size: 12px; color: #8A8F98; }
+    .mood-avg-val { font-size: 14px; font-weight: 700; color: #34d399; }
+
+    /* TODAY'S LOG */
+    .log-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .log-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-time { font-size: 12px; color: #475569; font-weight: 500; min-width: 44px; font-variant-numeric: tabular-nums; }
+    .log-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .log-dot.focus { background: #8B5CF6; box-shadow: 0 0 6px rgba(139,92,246,0.3); }
+    .log-dot.rest { background: #059669; }
+    .log-info { flex: 1; }
+    .log-task { font-size: 13px; color: #EDEDEF; font-weight: 500; }
+    .log-meta { font-size: 11px; color: #64748b; margin-top: 1px; }
+    .log-mood { font-size: 16px; flex-shrink: 0; }
+
+    /* BOTTOM NAV */
+    .bnav {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      padding: 12px 0 0;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .bnav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      color: #475569; font-size: 10px; font-weight: 500; cursor: pointer;
+    }
+    .bnav-item.active { color: #8B5CF6; }
+    .bnav-item svg { width: 20px; height: 20px; }
+
+    /* DESIGN NOTES */
+    .notes {
+      max-width: 420px;
+      flex-shrink: 0;
+    }
+    .notes h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 20px; }
+    .nb { margin-bottom: 18px; padding-left: 14px; border-left: 2px solid rgba(139,92,246,0.25); }
+    .nb .t { font-size: 12px; font-weight: 700; color: #C4B5FD; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .nb .b { font-size: 13px; color: #8A8F98; line-height: 1.6; }
+    .pbox {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+    .pbox .t { color: #8B5CF6; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .pbox .b { font-size: 13px; color: #8A8F98; line-height: 1.6; }
+    .data-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .data-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #8A8F98;
+    }
+    .data-item .key {
+      min-width: 100px;
+      color: #64748b;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Insights Dashboard</h2>
+<p class="page-sub">Track progress without pressure · Celebrate patterns · Never punish</p>
+
+<!-- PHONE -->
+<div class="phone">
+  <div class="ambient amb1"></div>
+  <div class="ambient amb2"></div>
+
+  <div class="status"><span>9:41</span><span></span></div>
+
+  <div class="scr">
+    <!-- Header -->
+    <div class="dash-header">
+      <div class="dash-title">Insights</div>
+      <div class="period-pill">
+        <div class="period-opt active">Week</div>
+        <div class="period-opt">Month</div>
+        <div class="period-opt">All</div>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero-stat">
+      <div class="hero-num">3h 42m</div>
+      <div class="hero-label">Total focus time this week</div>
+      <div class="hero-sub">↑ 45 min more than last week</div>
+    </div>
+
+    <!-- Mini stats -->
+    <div class="mini-stats">
+      <div class="mini-stat">
+        <div class="mini-val" style="color:#F59E0B;">5</div>
+        <div class="mini-lbl">Day streak</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-val" style="color:#8B5CF6;">12</div>
+        <div class="mini-lbl">Sessions</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-val" style="color:#059669;">25m</div>
+        <div class="mini-lbl">Avg length</div>
+      </div>
+    </div>
+
+    <!-- Heatmap -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Focus Heatmap
+    </div>
+    <div class="heatmap-card">
+      <div class="heatmap-days">
+        <div class="heatmap-day">Mon</div>
+        <div class="heatmap-day">Tue</div>
+        <div class="heatmap-day">Wed</div>
+        <div class="heatmap-day">Thu</div>
+        <div class="heatmap-day">Fri</div>
+        <div class="heatmap-day">Sat</div>
+        <div class="heatmap-day">Sun</div>
+      </div>
+      <div class="heatmap-grid">
+        <div class="heatmap-col"><div class="heatmap-cell l2"></div><div class="heatmap-cell l1"></div><div class="heatmap-cell l3"></div><div class="heatmap-cell l1"></div></div>
+        <div class="heatmap-col"><div class="heatmap-cell l4"></div><div class="heatmap-cell l2"></div><div class="heatmap-cell l1"></div><div class="heatmap-cell l3"></div></div>
+        <div class="heatmap-col"><div class="heatmap-cell l1"></div><div class="heatmap-cell l3"></div><div class="heatmap-cell l2"></div><div class="heatmap-cell l4"></div></div>
+        <div class="heatmap-col"><div class="heatmap-cell l3"></div><div class="heatmap-cell l2"></div><div class="heatmap-cell l4"></div><div class="heatmap-cell today l3"></div></div>
+        <div class="heatmap-col"><div class="heatmap-cell l2"></div><div class="heatmap-cell"></div><div class="heatmap-cell l1"></div><div class="heatmap-cell"></div></div>
+        <div class="heatmap-col"><div class="heatmap-cell"></div><div class="heatmap-cell l1"></div><div class="heatmap-cell"></div><div class="heatmap-cell"></div></div>
+        <div class="heatmap-col"><div class="heatmap-cell l1"></div><div class="heatmap-cell"></div><div class="heatmap-cell l1"></div><div class="heatmap-cell"></div></div>
+      </div>
+      <div class="heatmap-legend">
+        Less
+        <div class="legend-cell" style="background:rgba(255,255,255,0.03)"></div>
+        <div class="legend-cell" style="background:rgba(139,92,246,0.15)"></div>
+        <div class="legend-cell" style="background:rgba(139,92,246,0.3)"></div>
+        <div class="legend-cell" style="background:rgba(139,92,246,0.5)"></div>
+        <div class="legend-cell" style="background:rgba(139,92,246,0.75)"></div>
+        More
+      </div>
+    </div>
+
+    <!-- Milestones -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Milestones
+    </div>
+    <div class="milestones">
+      <div class="milestone achieved">
+        <div class="ms-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        </div>
+        <div class="ms-days">3</div>
+        <div class="ms-label">Done</div>
+      </div>
+      <div class="milestone achieved">
+        <div class="ms-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        </div>
+        <div class="ms-days">5</div>
+        <div class="ms-label">Active</div>
+      </div>
+      <div class="milestone next">
+        <div class="ms-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="ms-days">7</div>
+        <div class="ms-label">2 to go</div>
+      </div>
+      <div class="milestone next">
+        <div class="ms-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="ms-days">14</div>
+        <div class="ms-label">9 to go</div>
+      </div>
+      <div class="milestone next">
+        <div class="ms-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="ms-days">30</div>
+        <div class="ms-label">25 to go</div>
+      </div>
+    </div>
+
+    <!-- Mood Trend -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      Mood Trend
+    </div>
+    <div class="mood-card">
+      <div class="mood-chart">
+        <div class="mood-bar-group">
+          <div class="mood-bar" style="height:55%; background:linear-gradient(to top, rgba(139,92,246,0.2), rgba(139,92,246,0.5));"></div>
+          <div class="mood-day-label">M</div>
+        </div>
+        <div class="mood-bar-group">
+          <div class="mood-bar" style="height:70%; background:linear-gradient(to top, rgba(52,211,153,0.2), rgba(52,211,153,0.5));"></div>
+          <div class="mood-day-label">T</div>
+        </div>
+        <div class="mood-bar-group">
+          <div class="mood-bar" style="height:40%; background:linear-gradient(to top, rgba(245,158,11,0.2), rgba(245,158,11,0.5));"></div>
+          <div class="mood-day-label">W</div>
+        </div>
+        <div class="mood-bar-group">
+          <div class="mood-bar" style="height:85%; background:linear-gradient(to top, rgba(52,211,153,0.2), rgba(52,211,153,0.6));"></div>
+          <div class="mood-day-label">T</div>
+        </div>
+        <div class="mood-bar-group">
+          <div class="mood-bar" style="height:65%; background:linear-gradient(to top, rgba(139,92,246,0.2), rgba(139,92,246,0.5));"></div>
+          <div class="mood-day-label">F</div>
+        </div>
+        <div class="mood-bar-group">
+          <div class="mood-bar" style="height:30%; background:linear-gradient(to top, rgba(255,255,255,0.05), rgba(255,255,255,0.1));"></div>
+          <div class="mood-day-label">S</div>
+        </div>
+        <div class="mood-bar-group">
+          <div class="mood-bar" style="height:45%; background:linear-gradient(to top, rgba(139,92,246,0.2), rgba(139,92,246,0.4));"></div>
+          <div class="mood-day-label">S</div>
+        </div>
+      </div>
+      <div class="mood-avg">
+        <div class="mood-avg-text">Average mood</div>
+        <div class="mood-avg-val">Good ↑</div>
+      </div>
+    </div>
+
+    <!-- Today's Log -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Today's Sessions
+    </div>
+    <div class="log-card">
+      <div class="log-item">
+        <div class="log-time">9:10</div>
+        <div class="log-dot focus"></div>
+        <div class="log-info">
+          <div class="log-task">Write essay intro</div>
+          <div class="log-meta">25 min focus</div>
+        </div>
+        <svg class="log-mood" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      </div>
+      <div class="log-item">
+        <div class="log-time">10:05</div>
+        <div class="log-dot focus"></div>
+        <div class="log-info">
+          <div class="log-task">Research sources</div>
+          <div class="log-meta">15 min focus</div>
+        </div>
+        <svg class="log-mood" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      </div>
+      <div class="log-item">
+        <div class="log-time">11:30</div>
+        <div class="log-dot focus"></div>
+        <div class="log-info">
+          <div class="log-task">Draft outline</div>
+          <div class="log-meta">5 min focus</div>
+        </div>
+        <svg class="log-mood" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="bnav">
+      <div class="bnav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Timer
+      </div>
+      <div class="bnav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        Insights
+      </div>
+      <div class="bnav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </div>
+    </div>
+    <div class="home-ind"></div>
+  </div>
+</div>
+
+<!-- NOTES -->
+<div class="notes">
+  <h3>Insights Design</h3>
+
+  <div class="nb">
+    <div class="t">Hero Stat: Total Focus Time</div>
+    <div class="b">The biggest number on the page is total focus time — not session count, not streak. Because time spent focusing is the truest measure of effort. The comparison ("↑ 45 min more than last week") is always framed positively — if it's down, it says "Let's build on that this week" not "down 30%."</div>
+  </div>
+
+  <div class="nb">
+    <div class="t">GitHub-style Heatmap</div>
+    <div class="b">4-week heatmap with intensity = sessions per day. Familiar pattern (every dev knows this from GitHub). Empty cells are neutral, not red. Shows patterns: "I focus more on Tuesdays" is actionable insight. TODAY is outlined to show where you are.</div>
+  </div>
+
+  <div class="nb">
+    <div class="t">Milestone Journey</div>
+    <div class="b">Horizontal scroll of milestone badges: 3, 5, 7, 14, 30, 60, 100 days. Achieved ones glow with violet. Upcoming ones show "X to go." After a broken streak: the journey doesn't reset — achieved milestones stay achieved. "Starting fresh 🌱" replaces the streak but past milestones remain.</div>
+  </div>
+
+  <div class="nb">
+    <div class="t">Mood Trend Bars</div>
+    <div class="b">Daily average mood as bar height + gradient color. Green = great days, violet = good, amber = okay, low bar = hard. A quick visual pulse of the week. Average mood shown as a summary word, not a cold number.</div>
+  </div>
+
+  <div class="nb">
+    <div class="t">Session Log</div>
+    <div class="b">Today's sessions with time, task name, duration, and mood icon. A personal timeline of effort. Seeing "3 sessions, 47 minutes" in concrete form is deeply validating for ADHD brains that often feel like they "did nothing all day."</div>
+  </div>
+
+  <div class="pbox">
+    <div class="t">Data Model (localStorage)</div>
+    <div class="b">Everything stored locally, no backend required.</div>
+    <div class="data-list">
+      <div class="data-item"><span class="key">sessions[]</span> {date, startTime, duration, task, mood, completed}</div>
+      <div class="data-item"><span class="key">streaks</span> {current, longest, lastActiveDate}</div>
+      <div class="data-item"><span class="key">milestones[]</span> {target, achievedDate}</div>
+      <div class="data-item"><span class="key">settings</span> {defaultDuration, breathingEnabled, soundEnabled}</div>
+      <div class="data-item"><span class="key">today</span> computed from sessions[] on load</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A beautiful Pomodoro Timer — 25 minutes of focused work, 10 minutes of rest. Stay productive.">
+  <title>25:00 — Work | Pomodoro</title>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ========================================
+       CSS Custom Properties — Design Tokens
+       Two palettes: warm (WORK) + cool (REST)
+       ======================================== */
+    :root {
+      /* Dark base */
+      --bg-dark: #0a0a0f;
+      --bg-surface: rgba(255, 255, 255, 0.04);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(240, 240, 245, 0.55);
+
+      /* WORK palette — warm coral/amber */
+      --work-accent: #ff6b4a;
+      --work-accent-glow: rgba(255, 107, 74, 0.35);
+      --work-gradient-start: #ff6b4a;
+      --work-gradient-end: #ff9a44;
+      --work-bg-tint: rgba(255, 107, 74, 0.06);
+      --work-ring: rgba(255, 107, 74, 0.15);
+
+      /* REST palette — cool teal/blue */
+      --rest-accent: #4ad4c1;
+      --rest-accent-glow: rgba(74, 212, 193, 0.35);
+      --rest-gradient-start: #4ad4c1;
+      --rest-gradient-end: #44a5ff;
+      --rest-bg-tint: rgba(74, 212, 193, 0.06);
+      --rest-ring: rgba(74, 212, 193, 0.15);
+
+      /* Active palette (JS toggles data-mode on <html>) */
+      --accent: var(--work-accent);
+      --accent-glow: var(--work-accent-glow);
+      --gradient-start: var(--work-gradient-start);
+      --gradient-end: var(--work-gradient-end);
+      --bg-tint: var(--work-bg-tint);
+      --ring-color: var(--work-ring);
+
+      /* Spacing & radius */
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 28px;
+      --radius-full: 999px;
+
+      /* Transitions */
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --transition-fast: 0.2s var(--ease-out);
+      --transition-med: 0.45s var(--ease-out);
+      --transition-slow: 0.7s var(--ease-out);
+    }
+
+    /* REST mode overrides via data attribute on <html> */
+    html[data-mode="rest"] {
+      --accent: var(--rest-accent);
+      --accent-glow: var(--rest-accent-glow);
+      --gradient-start: var(--rest-gradient-start);
+      --gradient-end: var(--rest-gradient-end);
+      --bg-tint: var(--rest-bg-tint);
+      --ring-color: var(--rest-ring);
+    }
+
+    /* ========================================
+       Reset & Base
+       ======================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: background var(--transition-slow);
+    }
+
+    /* ========================================
+       Ambient Background Glow
+       Shifts color with mode change
+       ======================================== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, var(--bg-tint) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 80% at 80% 80%, var(--accent-glow) 0%, transparent 60%);
+      opacity: 0.5;
+      pointer-events: none;
+      transition: background var(--transition-slow);
+      z-index: 0;
+    }
+
+    /* ========================================
+       Main Container
+       ======================================== */
+    main {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 440px;
+      padding: 20px;
+    }
+
+    /* ========================================
+       Timer Card — Glassmorphism
+       ======================================== */
+    .timer-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(40px) saturate(1.3);
+      -webkit-backdrop-filter: blur(40px) saturate(1.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      padding: 48px 36px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 4px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: border-color var(--transition-med);
+    }
+
+    /* Decorative top accent bar */
+    .timer-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      border-radius: 0 0 4px 4px;
+      transition: background var(--transition-med);
+    }
+
+    /* ========================================
+       Mode Badge
+       ======================================== */
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 36px;
+      transition:
+        color var(--transition-med),
+        border-color var(--transition-med),
+        background var(--transition-med);
+    }
+
+    .mode-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      transition: background var(--transition-med);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ========================================
+       Countdown Ring + Display
+       ======================================== */
+    .timer-ring-wrapper {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      margin: 0 auto 36px;
+    }
+
+    .timer-ring {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .timer-ring__track {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.06);
+      stroke-width: 5;
+    }
+
+    .timer-ring__progress {
+      fill: none;
+      stroke: url(#ring-gradient);
+      stroke-width: 5;
+      stroke-linecap: round;
+      /* Full circumference = 2 * π * 110 ≈ 691.15 */
+      stroke-dasharray: 691.15;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.4s var(--ease-out);
+      filter: drop-shadow(0 0 8px var(--accent-glow));
+    }
+
+    /* Countdown digits absolutely centered inside the ring */
+    .timer-display {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-primary);
+      user-select: none;
+    }
+
+    .timer-display .colon {
+      opacity: 0.4;
+      margin: 0 2px;
+      animation: blink-colon 1s step-end infinite;
+    }
+
+    /* Colon blinks only when timer is running */
+    .timer-display .colon.paused {
+      animation: none;
+      opacity: 0.4;
+    }
+
+    @keyframes blink-colon {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* Digit change micro-animation */
+    .timer-display .digit {
+      display: inline-block;
+      transition: transform 0.15s var(--ease-out), opacity 0.15s ease;
+    }
+
+    .timer-display .digit.tick {
+      transform: translateY(-3px) scale(1.05);
+      opacity: 0.7;
+    }
+
+    /* ========================================
+       Session Counter
+       ======================================== */
+    .session-counter {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+      font-weight: 400;
+      transition: color var(--transition-med);
+    }
+
+    .session-counter strong {
+      color: var(--accent);
+      font-weight: 700;
+      transition: color var(--transition-med);
+    }
+
+    /* ========================================
+       Controls
+       ======================================== */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      border-radius: var(--radius-full);
+      padding: 14px 32px;
+      transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-med),
+        opacity var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Ripple effect on click */
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: inherit;
+      transform: scale(0);
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    .btn:active::after {
+      transform: scale(2.5);
+      opacity: 0;
+      transition: 0s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    /* Primary button — gradient accent */
+    .btn--primary {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: #0a0a0f;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .btn--primary:hover {
+      box-shadow: 0 6px 30px var(--accent-glow);
+    }
+
+    /* Secondary button — ghost style */
+    .btn--secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn--secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    /* Disabled state */
+    .btn:disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .btn--danger {
+      background: rgba(255, 87, 87, 0.15);
+      color: #ffd4d4;
+      border: 1px solid rgba(255, 87, 87, 0.35);
+    }
+
+    .btn--danger:hover {
+      background: rgba(255, 87, 87, 0.22);
+      border-color: rgba(255, 87, 87, 0.45);
+    }
+
+    .tracker-panel {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .panel-title {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 10px 12px;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .category-list,
+    .history-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .category-item,
+    .history-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.82rem;
+    }
+
+    .history-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .history-item-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .history-item-meta {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .history-filter {
+      margin-bottom: 10px;
+    }
+
+    .summary-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.68);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      padding: 16px;
+    }
+
+    .summary-modal.active {
+      display: flex;
+    }
+
+    .summary-card {
+      width: 100%;
+      max-width: 440px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #11111a;
+      padding: 20px;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .summary-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .summary-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      margin-bottom: 12px;
+    }
+
+    .summary-duration {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.84rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    /* ========================================
+       Screen Flash Alert
+       ======================================== */
+    .flash-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      transition: opacity 0.1s ease;
+    }
+
+    .flash-overlay.active {
+      animation: screen-flash 0.8s ease-out forwards;
+    }
+
+    @keyframes screen-flash {
+      0% { opacity: 0.45; }
+      100% { opacity: 0; }
+    }
+
+    /* ========================================
+       Mode Transition Pulse
+       ======================================== */
+    .timer-card.mode-switch {
+      animation: card-pulse 0.6s ease-out;
+    }
+
+    @keyframes card-pulse {
+      0% { transform: scale(1); box-shadow: 0 4px 30px rgba(0,0,0,0.4); }
+      30% { transform: scale(1.025); box-shadow: 0 4px 50px var(--accent-glow); }
+      100% { transform: scale(1); box-shadow: 0 4px 30px rgba(0,0,0,0.4); }
+    }
+
+    /* ========================================
+       Footer
+       ======================================== */
+    .footer-note {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.18);
+      letter-spacing: 0.04em;
+    }
+
+    /* ========================================
+       Responsive
+       ======================================== */
+    @media (max-width: 480px) {
+      .timer-card {
+        padding: 36px 24px 32px;
+        border-radius: var(--radius-md);
+      }
+
+      .timer-ring-wrapper {
+        width: 200px;
+        height: 200px;
+      }
+
+      .timer-display {
+        font-size: 3.2rem;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        font-size: 0.82rem;
+      }
+
+      .controls {
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .field-grid,
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .timer-ring-wrapper {
+        width: 170px;
+        height: 170px;
+      }
+
+      .timer-display {
+        font-size: 2.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Screen flash overlay — triggered on mode switch -->
+  <div class="flash-overlay" id="flash-overlay"></div>
+
+  <main>
+    <section class="timer-card" id="timer-card">
+
+      <!-- Mode badge: WORK or REST -->
+      <div class="mode-badge" id="mode-badge">
+        <span class="dot" id="mode-dot"></span>
+        <span id="mode-label">Work</span>
+      </div>
+
+      <!-- SVG circular progress ring + centered time display -->
+      <div class="timer-ring-wrapper">
+        <svg class="timer-ring" viewBox="0 0 240 240" id="timer-ring-svg">
+          <defs>
+            <!-- Gradient follows the active accent colors -->
+            <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" id="grad-stop-1" stop-color="#ff6b4a" />
+              <stop offset="100%" id="grad-stop-2" stop-color="#ff9a44" />
+            </linearGradient>
+          </defs>
+          <!-- Background track -->
+          <circle class="timer-ring__track" cx="120" cy="120" r="110" />
+          <!-- Animated progress arc -->
+          <circle class="timer-ring__progress" cx="120" cy="120" r="110" id="ring-progress" />
+        </svg>
+
+        <div class="timer-display" id="timer-display">
+          <span class="digit" id="digit-m1">2</span><span class="digit" id="digit-m2">5</span><span class="colon paused" id="colon">:</span><span class="digit" id="digit-s1">0</span><span class="digit" id="digit-s2">0</span>
+        </div>
+      </div>
+
+      <!-- Session counter -->
+      <p class="session-counter" id="session-counter">
+        Sessions completed: <strong id="session-count">0</strong>
+      </p>
+
+      <!-- Control buttons -->
+      <div class="controls">
+        <button class="btn btn--primary" id="btn-start">Start</button>
+        <button class="btn btn--secondary" id="btn-pause" disabled>Pause</button>
+        <button class="btn btn--danger" id="btn-stop">Stop & Log</button>
+        <button class="btn btn--secondary" id="btn-reset">Reset</button>
+      </div>
+
+      <section class="tracker-panel">
+        <h2 class="panel-title">Current Study Focus</h2>
+        <div class="field-grid">
+          <div class="field">
+            <label for="task-name">Task</label>
+            <input id="task-name" type="text" placeholder="e.g. Chapter 4 numericals">
+          </div>
+          <div class="field">
+            <label for="task-category">Category</label>
+            <input id="task-category" type="text" list="category-list" placeholder="e.g. Math">
+            <datalist id="category-list"></datalist>
+          </div>
+        </div>
+      </section>
+
+      <section class="tracker-panel">
+        <h2 class="panel-title">Local Analysis</h2>
+        <div class="analysis-grid">
+          <article class="stat-card">
+            <p class="stat-label">Today Focus</p>
+            <p class="stat-value" id="today-total">0m</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Last 7 Days</p>
+            <p class="stat-value" id="week-total">0m</p>
+          </article>
+          <article class="stat-card">
+            <p class="stat-label">Study Streak</p>
+            <p class="stat-value" id="streak-days">0d</p>
+          </article>
+        </div>
+        <ul class="category-list" id="category-breakdown"></ul>
+      </section>
+
+      <section class="tracker-panel">
+        <h2 class="panel-title">History by Date</h2>
+        <div class="history-filter field">
+          <label for="history-date">Date</label>
+          <input id="history-date" type="date">
+        </div>
+        <ul class="history-list" id="history-list"></ul>
+      </section>
+
+    </section>
+
+    <p class="footer-note">Built with focus. No distractions.</p>
+  </main>
+
+  <div class="summary-modal" id="summary-modal" role="dialog" aria-modal="true" aria-labelledby="summary-title">
+    <div class="summary-card">
+      <h3 class="summary-title" id="summary-title">Log Session</h3>
+      <p class="summary-subtitle" id="summary-subtitle">Add context so your analytics stay useful.</p>
+      <div class="summary-duration" id="summary-duration">Focused time: 00m 00s</div>
+      <div class="field">
+        <label for="summary-task">What did you work on?</label>
+        <input id="summary-task" type="text" placeholder="Topic or task name">
+      </div>
+      <div class="field">
+        <label for="summary-category">Category</label>
+        <input id="summary-category" type="text" list="category-list" placeholder="Select or type category">
+      </div>
+      <div class="field">
+        <label for="summary-notes">Notes (optional)</label>
+        <textarea id="summary-notes" placeholder="What got done? blockers?"></textarea>
+      </div>
+      <div class="summary-actions">
+        <button class="btn btn--secondary" id="btn-summary-skip">Skip</button>
+        <button class="btn btn--primary" id="btn-summary-save">Save Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WORK_SECONDS = 25 * 60;
+    const REST_SECONDS = 10 * 60;
+    const CIRCUMFERENCE = 2 * Math.PI * 110;
+    const DB_NAME = 'pomodoro-local-tracker';
+    const DB_VERSION = 1;
+    const PENDING_KEY = 'pomodoro-pending-session';
+    const defaultCategories = ['Deep Work', 'Revision', 'Reading', 'Practice', 'Coding', 'Break', 'Admin'];
+
+    let mode = 'work';
+    let totalSeconds = WORK_SECONDS;
+    let remainingSeconds = WORK_SECONDS;
+    let isRunning = false;
+    let intervalId = null;
+    let sessionsCompleted = 0;
+    let db = null;
+    let modeStartedAt = null;
+    let summaryContext = null;
+
+    const btnStart = document.getElementById('btn-start');
+    const btnPause = document.getElementById('btn-pause');
+    const btnStop = document.getElementById('btn-stop');
+    const btnReset = document.getElementById('btn-reset');
+    const modeLabel = document.getElementById('mode-label');
+    const digitM1 = document.getElementById('digit-m1');
+    const digitM2 = document.getElementById('digit-m2');
+    const digitS1 = document.getElementById('digit-s1');
+    const digitS2 = document.getElementById('digit-s2');
+    const colon = document.getElementById('colon');
+    const ringProgress = document.getElementById('ring-progress');
+    const sessionCount = document.getElementById('session-count');
+    const timerCard = document.getElementById('timer-card');
+    const flashOverlay = document.getElementById('flash-overlay');
+    const gradStop1 = document.getElementById('grad-stop-1');
+    const gradStop2 = document.getElementById('grad-stop-2');
+    const taskNameInput = document.getElementById('task-name');
+    const taskCategoryInput = document.getElementById('task-category');
+    const categoryList = document.getElementById('category-list');
+    const todayTotalEl = document.getElementById('today-total');
+    const weekTotalEl = document.getElementById('week-total');
+    const streakDaysEl = document.getElementById('streak-days');
+    const categoryBreakdownEl = document.getElementById('category-breakdown');
+    const historyDateInput = document.getElementById('history-date');
+    const historyListEl = document.getElementById('history-list');
+    const summaryModal = document.getElementById('summary-modal');
+    const summarySubtitle = document.getElementById('summary-subtitle');
+    const summaryDuration = document.getElementById('summary-duration');
+    const summaryTask = document.getElementById('summary-task');
+    const summaryCategory = document.getElementById('summary-category');
+    const summaryNotes = document.getElementById('summary-notes');
+    const btnSummarySave = document.getElementById('btn-summary-save');
+    const btnSummarySkip = document.getElementById('btn-summary-skip');
+
+    const palettes = {
+      work: { gradStart: '#ff6b4a', gradEnd: '#ff9a44' },
+      rest: { gradStart: '#4ad4c1', gradEnd: '#44a5ff' }
+    };
+
+    function toDateKey(value) {
+      const date = new Date(value);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDuration(seconds) {
+      const safe = Math.max(0, Math.floor(seconds));
+      const hrs = Math.floor(safe / 3600);
+      const mins = Math.floor((safe % 3600) / 60);
+      const secs = safe % 60;
+      if (hrs > 0) return `${hrs}h ${mins}m`;
+      if (mins > 0) return `${mins}m ${secs}s`;
+      return `${secs}s`;
+    }
+
+    function setButtonState() {
+      btnStart.disabled = isRunning;
+      btnPause.disabled = !isRunning;
+      if (isRunning) colon.classList.remove('paused');
+      else colon.classList.add('paused');
+    }
+
+    function getElapsedSeconds() {
+      return Math.max(0, totalSeconds - remainingSeconds);
+    }
+
+    function updateDigit(el, newValue) {
+      if (el.textContent !== newValue) {
+        el.textContent = newValue;
+        el.classList.add('tick');
+        setTimeout(() => el.classList.remove('tick'), 150);
+      }
+    }
+
+    function renderTime() {
+      const mins = Math.floor(remainingSeconds / 60);
+      const secs = remainingSeconds % 60;
+      const mm = String(mins).padStart(2, '0');
+      const ss = String(secs).padStart(2, '0');
+
+      updateDigit(digitM1, mm[0]);
+      updateDigit(digitM2, mm[1]);
+      updateDigit(digitS1, ss[0]);
+      updateDigit(digitS2, ss[1]);
+
+      const modeTitle = mode === 'work' ? 'Work' : 'Rest';
+      document.title = `${mm}:${ss} — ${modeTitle} | Pomodoro`;
+    }
+
+    function renderRing() {
+      const fraction = remainingSeconds / totalSeconds;
+      const offset = CIRCUMFERENCE * (1 - fraction);
+      ringProgress.style.strokeDashoffset = offset;
+    }
+
+    function applyModePalette() {
+      document.documentElement.setAttribute('data-mode', mode);
+      const p = palettes[mode];
+      gradStop1.setAttribute('stop-color', p.gradStart);
+      gradStop2.setAttribute('stop-color', p.gradEnd);
+      modeLabel.textContent = mode === 'work' ? 'Work' : 'Rest';
+    }
+
+    function resetCurrentModeTimer() {
+      pauseTimer();
+      remainingSeconds = mode === 'work' ? WORK_SECONDS : REST_SECONDS;
+      totalSeconds = remainingSeconds;
+      modeStartedAt = null;
+      setButtonState();
+      renderTime();
+      renderRing();
+    }
+
+    function switchMode() {
+      mode = mode === 'work' ? 'rest' : 'work';
+      remainingSeconds = mode === 'work' ? WORK_SECONDS : REST_SECONDS;
+      totalSeconds = remainingSeconds;
+      modeStartedAt = null;
+      applyModePalette();
+      timerCard.classList.remove('mode-switch');
+      void timerCard.offsetWidth;
+      timerCard.classList.add('mode-switch');
+      renderTime();
+      renderRing();
+      setButtonState();
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      if (!modeStartedAt) modeStartedAt = new Date().toISOString();
+
+      isRunning = true;
+      setButtonState();
+      const startedAt = Date.now();
+      const startRemaining = remainingSeconds;
+
+      intervalId = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+        remainingSeconds = Math.max(0, startRemaining - elapsed);
+        renderTime();
+        renderRing();
+
+        if (remainingSeconds <= 0) {
+          pauseTimer();
+          onSessionEnd();
+        }
+      }, 250);
+    }
+
+    function pauseTimer() {
+      isRunning = false;
+      clearInterval(intervalId);
+      intervalId = null;
+      setButtonState();
+    }
+
+    function triggerFlash() {
+      flashOverlay.classList.remove('active');
+      void flashOverlay.offsetWidth;
+      flashOverlay.classList.add('active');
+    }
+
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(880, ctx.currentTime);
+        gain1.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(ctx.currentTime);
+        osc1.stop(ctx.currentTime + 0.4);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(660, ctx.currentTime + 0.2);
+        gain2.gain.setValueAtTime(0.25, ctx.currentTime + 0.2);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(ctx.currentTime + 0.2);
+        osc2.stop(ctx.currentTime + 0.7);
+
+        setTimeout(() => ctx.close(), 1000);
+      } catch (_e) {}
+    }
+
+    function describeSummaryReason(reason) {
+      if (reason === 'timer-complete') return 'Timer completed. Add a quick session summary.';
+      if (reason === 'manual-stop') return 'You stopped the timer. Capture what you did before resetting.';
+      if (reason === 'manual-reset') return 'You reset the timer. Save progress before clearing the clock.';
+      if (reason === 'restore-pending') return 'Recovered from app close while timing. Save or skip this recovered session.';
+      return 'Add context so your analytics stay useful.';
+    }
+
+    function openSummaryModal(context) {
+      summaryContext = context;
+      summarySubtitle.textContent = describeSummaryReason(context.reason);
+      summaryDuration.textContent = `Focused time: ${formatDuration(context.durationSeconds)} (${context.mode.toUpperCase()})`;
+      summaryTask.value = context.prefillTask || taskNameInput.value.trim();
+      summaryCategory.value = context.prefillCategory || taskCategoryInput.value.trim();
+      summaryNotes.value = context.prefillNotes || '';
+      summaryModal.classList.add('active');
+      summaryTask.focus();
+    }
+
+    function closeSummaryModal() {
+      summaryModal.classList.remove('active');
+      summaryContext = null;
+    }
+
+    function buildSessionRecord(context) {
+      const endedAt = new Date();
+      const startedAt = context.startedAt
+        ? new Date(context.startedAt)
+        : new Date(endedAt.getTime() - context.durationSeconds * 1000);
+      const task = summaryTask.value.trim() || taskNameInput.value.trim() || (context.mode === 'rest' ? 'Break' : 'Untitled Session');
+      const category = summaryCategory.value.trim() || taskCategoryInput.value.trim() || (context.mode === 'rest' ? 'Break' : 'General');
+
+      taskNameInput.value = task;
+      taskCategoryInput.value = category;
+
+      return {
+        mode: context.mode,
+        status: context.status,
+        reason: context.reason,
+        startedAt: startedAt.toISOString(),
+        endedAt: endedAt.toISOString(),
+        dateKey: toDateKey(endedAt),
+        durationSeconds: context.durationSeconds,
+        task,
+        category,
+        notes: summaryNotes.value.trim(),
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function persistPendingSession() {
+      const elapsedSeconds = getElapsedSeconds();
+      if (elapsedSeconds < 1) return;
+      const pending = {
+        mode,
+        status: 'interrupted',
+        reason: 'restore-pending',
+        durationSeconds: elapsedSeconds,
+        startedAt: modeStartedAt || new Date(Date.now() - elapsedSeconds * 1000).toISOString(),
+        prefillTask: taskNameInput.value.trim(),
+        prefillCategory: taskCategoryInput.value.trim()
+      };
+      localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    }
+
+    function maybeHandleRecoveredSession() {
+      const raw = localStorage.getItem(PENDING_KEY);
+      if (!raw) return;
+      try {
+        const pending = JSON.parse(raw);
+        if (!pending || pending.durationSeconds < 1) return;
+        openSummaryModal(pending);
+      } catch (_e) {
+        localStorage.removeItem(PENDING_KEY);
+      }
+    }
+
+    function onSessionEnd() {
+      triggerFlash();
+      playBeep();
+
+      if (mode === 'work') {
+        sessionsCompleted += 1;
+        sessionCount.textContent = sessionsCompleted;
+      }
+
+      const elapsedSeconds = totalSeconds;
+      openSummaryModal({
+        mode,
+        status: 'completed',
+        reason: 'timer-complete',
+        durationSeconds: elapsedSeconds,
+        startedAt: modeStartedAt || new Date(Date.now() - elapsedSeconds * 1000).toISOString(),
+        onAfterClose: () => {
+          switchMode();
+        }
+      });
+    }
+
+    function stopAndLogCurrentSession(reason, status) {
+      pauseTimer();
+      const elapsedSeconds = getElapsedSeconds();
+      if (elapsedSeconds < 1) {
+        resetCurrentModeTimer();
+        return;
+      }
+
+      openSummaryModal({
+        mode,
+        status,
+        reason,
+        durationSeconds: elapsedSeconds,
+        startedAt: modeStartedAt || new Date(Date.now() - elapsedSeconds * 1000).toISOString(),
+        onAfterClose: () => {
+          resetCurrentModeTimer();
+        }
+      });
+    }
+
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = event => {
+          const dbInstance = event.target.result;
+          if (!dbInstance.objectStoreNames.contains('sessions')) {
+            const store = dbInstance.createObjectStore('sessions', { keyPath: 'id', autoIncrement: true });
+            store.createIndex('dateKey', 'dateKey', { unique: false });
+            store.createIndex('startedAt', 'startedAt', { unique: false });
+            store.createIndex('category', 'category', { unique: false });
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function addSession(record) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('sessions', 'readwrite');
+        tx.objectStore('sessions').add(record);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    function getAllSessions() {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('sessions', 'readonly');
+        const request = tx.objectStore('sessions').getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function renderEmptyList(target, message) {
+      target.innerHTML = '';
+      const li = document.createElement('li');
+      li.className = 'empty-state';
+      li.textContent = message;
+      target.appendChild(li);
+    }
+
+    async function refreshAnalytics() {
+      if (!db) return;
+      const all = await getAllSessions();
+      const workSessions = all.filter(item => item.mode === 'work');
+      sessionsCompleted = workSessions.filter(item => item.status === 'completed').length;
+      sessionCount.textContent = sessionsCompleted;
+      const today = toDateKey(new Date());
+      const todayTotal = workSessions
+        .filter(item => item.dateKey === today)
+        .reduce((sum, item) => sum + (item.durationSeconds || 0), 0);
+      todayTotalEl.textContent = formatDuration(todayTotal);
+
+      const last7 = new Date();
+      last7.setDate(last7.getDate() - 6);
+      const weekTotal = workSessions
+        .filter(item => new Date(item.endedAt) >= last7)
+        .reduce((sum, item) => sum + (item.durationSeconds || 0), 0);
+      weekTotalEl.textContent = formatDuration(weekTotal);
+
+      const dayTotals = {};
+      for (const item of workSessions) {
+        dayTotals[item.dateKey] = (dayTotals[item.dateKey] || 0) + item.durationSeconds;
+      }
+
+      let streak = 0;
+      const cursor = new Date();
+      while (true) {
+        const key = toDateKey(cursor);
+        if (!dayTotals[key]) break;
+        streak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      streakDaysEl.textContent = `${streak}d`;
+
+      const categoryTotals = {};
+      for (const item of workSessions) {
+        const category = item.category || 'General';
+        categoryTotals[category] = (categoryTotals[category] || 0) + item.durationSeconds;
+      }
+
+      const topCategories = Object.entries(categoryTotals)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+      if (topCategories.length === 0) {
+        renderEmptyList(categoryBreakdownEl, 'No category data yet. Start a session to build analytics.');
+      } else {
+        categoryBreakdownEl.innerHTML = '';
+        for (const [name, seconds] of topCategories) {
+          const li = document.createElement('li');
+          li.className = 'category-item';
+          li.innerHTML = `<span>${name}</span><strong>${formatDuration(seconds)}</strong>`;
+          categoryBreakdownEl.appendChild(li);
+        }
+      }
+
+      await renderHistoryForDate(historyDateInput.value || today, all);
+      syncCategoryOptions(workSessions);
+    }
+
+    function syncCategoryOptions(records) {
+      const unique = new Set(defaultCategories);
+      for (const item of records) {
+        if (item.category) unique.add(item.category);
+      }
+      categoryList.innerHTML = '';
+      Array.from(unique).sort().forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        categoryList.appendChild(option);
+      });
+    }
+
+    async function renderHistoryForDate(dateKey, records) {
+      const all = records || await getAllSessions();
+      const entries = all
+        .filter(item => item.dateKey === dateKey)
+        .sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt));
+
+      if (entries.length === 0) {
+        renderEmptyList(historyListEl, `No records for ${dateKey}.`);
+        return;
+      }
+
+      historyListEl.innerHTML = '';
+      for (const item of entries) {
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        const ended = new Date(item.endedAt);
+        const time = ended.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const statusText = item.status === 'completed' ? 'Completed' : 'Stopped';
+        li.innerHTML = `
+          <div class="history-item-top"><span>${time}</span><span>${statusText}</span></div>
+          <p class="history-item-title">${item.task || 'Untitled Session'}</p>
+          <p class="history-item-meta">${item.category || 'General'} • ${formatDuration(item.durationSeconds)} • ${item.mode.toUpperCase()}</p>
+        `;
+        historyListEl.appendChild(li);
+      }
+    }
+
+    btnStart.addEventListener('click', startTimer);
+    btnPause.addEventListener('click', pauseTimer);
+    btnStop.addEventListener('click', () => stopAndLogCurrentSession('manual-stop', 'stopped'));
+    btnReset.addEventListener('click', () => stopAndLogCurrentSession('manual-reset', 'reset'));
+
+    btnSummarySave.addEventListener('click', async () => {
+      if (!summaryContext) return;
+      const record = buildSessionRecord(summaryContext);
+      const onAfterClose = summaryContext.onAfterClose;
+      try {
+        await addSession(record);
+        localStorage.removeItem(PENDING_KEY);
+        closeSummaryModal();
+        await refreshAnalytics();
+        if (onAfterClose) onAfterClose();
+      } catch (_e) {
+        alert('Could not save to local database. Please try again.');
+      }
+    });
+
+    btnSummarySkip.addEventListener('click', async () => {
+      if (!summaryContext) return;
+      localStorage.removeItem(PENDING_KEY);
+      const onAfterClose = summaryContext.onAfterClose;
+      closeSummaryModal();
+      if (onAfterClose) onAfterClose();
+      await refreshAnalytics();
+    });
+
+    summaryModal.addEventListener('click', event => {
+      if (event.target === summaryModal) {
+        btnSummarySkip.click();
+      }
+    });
+
+    historyDateInput.addEventListener('change', async () => {
+      if (!historyDateInput.value) return;
+      await renderHistoryForDate(historyDateInput.value);
+    });
+
+    window.addEventListener('beforeunload', event => {
+      if (!isRunning) return;
+      persistPendingSession();
+      event.preventDefault();
+      event.returnValue = '';
+    });
+
+    (async function init() {
+      applyModePalette();
+      renderTime();
+      renderRing();
+      setButtonState();
+      historyDateInput.value = toDateKey(new Date());
+      syncCategoryOptions([]);
+
+      try {
+        db = await initDB();
+        await refreshAnalytics();
+      } catch (_e) {
+        alert('Local database setup failed. History and analytics will not be available.');
+      }
+
+      maybeHandleRecoveredSession();
+    })();
+  </script>
+</body>
+</html>

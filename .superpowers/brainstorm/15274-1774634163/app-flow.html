@@ -1,0 +1,91 @@
+<h2>Focus Companion — App Flow</h2>
+<p class="subtitle">The 5 states your app cycles through. Click the one you want to discuss first.</p>
+
+<div style="
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 32px 0 40px;
+  font-size: 13px;
+  color: #94a3b8;
+">
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 10px 16px; text-align: center; min-width: 110px;">
+    <div style="font-size: 20px; margin-bottom: 4px;">🏠</div>
+    <div style="font-weight: 600; color: #e2e8f0;">Home</div>
+    <div style="font-size: 11px; color: #64748b;">Ready state</div>
+  </div>
+  <div style="color: #475569;">→</div>
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 10px 16px; text-align: center; min-width: 110px;">
+    <div style="font-size: 20px; margin-bottom: 4px;">🫁</div>
+    <div style="font-weight: 600; color: #e2e8f0;">Ritual</div>
+    <div style="font-size: 11px; color: #64748b;">Pre-session</div>
+  </div>
+  <div style="color: #475569;">→</div>
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 10px 16px; text-align: center; min-width: 110px;">
+    <div style="font-size: 20px; margin-bottom: 4px;">⏱️</div>
+    <div style="font-weight: 600; color: #e2e8f0;">Focus</div>
+    <div style="font-size: 11px; color: #64748b;">Timer running</div>
+  </div>
+  <div style="color: #475569;">→</div>
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 10px 16px; text-align: center; min-width: 110px;">
+    <div style="font-size: 20px; margin-bottom: 4px;">🎉</div>
+    <div style="font-weight: 600; color: #e2e8f0;">Celebrate</div>
+    <div style="font-size: 11px; color: #64748b;">Post-session</div>
+  </div>
+  <div style="color: #475569;">→</div>
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 10px 16px; text-align: center; min-width: 110px;">
+    <div style="font-size: 20px; margin-bottom: 4px;">😌</div>
+    <div style="font-weight: 600; color: #e2e8f0;">Rest</div>
+    <div style="font-size: 11px; color: #64748b;">Break timer</div>
+  </div>
+</div>
+
+<hr style="border: none; border-top: 1px solid #1e293b; margin: 32px 0;">
+
+<h3 style="margin-bottom: 16px;">Screen Details</h3>
+
+<div class="options">
+  <div class="option" data-choice="home" onclick="toggleSelect(this)">
+    <div class="letter">🏠</div>
+    <div class="content">
+      <h3>Home / Ready State</h3>
+      <p>What you see when you open the app. Shows: greeting message (time-aware), today's stats at a glance (sessions done, streak count), the timer ring set to your chosen duration, a big "Start Focus" button, and a small link to the Dashboard. Also: quick duration picker (5 / 15 / 25 / custom min) and an optional "What are you working on?" text field.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="ritual" onclick="toggleSelect(this)">
+    <div class="letter">🫁</div>
+    <div class="content">
+      <h3>Pre-Session Ritual (Optional, Skippable)</h3>
+      <p>A 10-second breathing animation: "Breathe in... hold... breathe out..." with an expanding/contracting circle. Purpose: create a mental transition between "I'm scrolling" and "I'm working." Always skippable — ADHD users hate forced gates. Fades into the timer automatically.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="focus" onclick="toggleSelect(this)">
+    <div class="letter">⏱️</div>
+    <div class="content">
+      <h3>Focus Mode (Timer Running)</h3>
+      <p>The existing timer, enhanced: dimmed background (ambient mode), the SVG ring counting down, your task name visible at top, and a subtle pulsing glow. Pause/Reset buttons available. Optional: a gentle mid-session chime at the halfway point as an anchor. Screen stays awake via Wake Lock API.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="celebrate" onclick="toggleSelect(this)">
+    <div class="letter">🎉</div>
+    <div class="content">
+      <h3>Celebration Screen (Post-Session)</h3>
+      <p>A 3-4 second celebration moment: particle/confetti burst animation, a rotating encouraging message ("You just did something hard. That matters."), session count increment animation, and a 1-tap mood check-in (5 emoji options: 😤😔😐🙂🔥). Then auto-transitions into rest timer.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="dashboard" onclick="toggleSelect(this)">
+    <div class="letter">📊</div>
+    <div class="content">
+      <h3>Dashboard (Stats View)</h3>
+      <p>A separate view (slide-up panel or page) showing: today's sessions with mood + task names, current streak with milestone badges (3, 7, 14, 30 days), a weekly focus heatmap (7 columns, intensity = session count), total lifetime focus hours, and a mood trend mini-chart. Accessed via a small icon on the home screen.</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 24px;">Click any screen to discuss it, or tell me in the terminal if this overall flow looks right.</p>
