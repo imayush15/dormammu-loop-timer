@@ -1,16 +1,66 @@
-# React + Vite
+# Dormammu Loop Timer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Time is not linear here.
+A local ritual console for focus cycles, session chronicles, and streak divination.
 
-Currently, two official plugins are available:
+## What This Relic Does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Summons configurable focus and break loops.
+- Stores every session in local IndexedDB memory.
+- Splits chronicles by date and category.
+- Reveals streaks, daily totals, and 7-day pulse.
+- Demands a session inscription when a loop ends, is sealed, or is rewound.
 
-## React Compiler
+## Arcane Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React + TypeScript + Vite
+- Local IndexedDB (`pomodoro-local-tracker`)
+- No backend. No cloud. No external persistence.
 
-## Expanding the ESLint configuration
+## Summoning Instructions
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+Open the portal at:
+
+```text
+http://localhost:5173
+```
+
+## Production Incantation
+
+```bash
+npm run build
+npm run preview
+```
+
+## Core Rituals
+
+- `Invoke Loop`: begin current cycle.
+- `Stall Time`: pause current cycle.
+- `Seal Chronicle`: stop and log progress.
+- `Rewind Ritual`: reset current cycle with summary flow.
+- `Bind New Runes`: apply custom focus/break durations.
+- `Inscribe Chronicle`: persist summary entry.
+
+## Local Memory Notes
+
+- Sessions are stored in IndexedDB object store: `sessions`.
+- Pending interrupted session context is stored in localStorage key:
+  `pomodoro:pending:v1`.
+
+## File Map (Runes)
+
+- `src/App.tsx` — orchestration layer
+- `src/components/` — UI fragments (`TimerPanel`, `InsightsPanel`, `SummaryModal`)
+- `src/hooks/` — timer + session store logic
+- `src/lib/` — constants, time helpers, audio, storage, IndexedDB adapter
+- `src/types/` — shared TypeScript domain types
+
+## Oath
+
+All records stay on your machine.
+The loop serves focus, not distraction.
